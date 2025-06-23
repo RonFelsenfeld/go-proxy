@@ -7,7 +7,7 @@ import (
 
 	"github.com/ronfelsenfeld/go-proxy/internal/config"
 	"github.com/ronfelsenfeld/go-proxy/internal/logger"
-	apiUtils "github.com/ronfelsenfeld/go-proxy/internal/utils/apiutils"
+	serverUtils "github.com/ronfelsenfeld/go-proxy/internal/utils/serverutils"
 )
 
 func pingHandler(responseWriter http.ResponseWriter, request *http.Request) {
@@ -19,7 +19,7 @@ func pingHandler(responseWriter http.ResponseWriter, request *http.Request) {
 }
 
 func proxyHandler(responseWriter http.ResponseWriter, request *http.Request, configuration *config.Config) {
-	requestBody, err := apiUtils.DecodeRequestBody(request)
+	requestBody, err := serverUtils.DecodeRequestBody(request)
 	if err != nil {
 		logger.Error.Printf("❌ %s", err.Error())
 		http.Error(responseWriter, err.Error(), http.StatusBadRequest)
@@ -29,14 +29,14 @@ func proxyHandler(responseWriter http.ResponseWriter, request *http.Request, con
 	requestBody[configuration.InjectKey] = configuration.InjectValue
 	logger.Info.Printf("🔨 Modified request body: %+v", requestBody)
 
-	modifiedBody, err := apiUtils.EncodeRequestBody(requestBody)
+	modifiedBody, err := serverUtils.EncodeRequestBody(requestBody)
 	if err != nil {
 		logger.Error.Printf("❌ %s", err.Error())
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	upstreamResponse, err := apiUtils.ForwardRequest(request, modifiedBody, configuration)
+	upstreamResponse, err := serverUtils.ForwardRequest(request, modifiedBody, configuration)
 	if err != nil {
 		logger.Error.Printf("❌ %s", err.Error())
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
@@ -44,7 +44,7 @@ func proxyHandler(responseWriter http.ResponseWriter, request *http.Request, con
 	}
 	defer upstreamResponse.Body.Close()
 
-	apiUtils.CopyHeaders(upstreamResponse.Header, responseWriter)
+	serverUtils.CopyHeaders(upstreamResponse.Header, responseWriter)
 
 	responseWriter.WriteHeader(upstreamResponse.StatusCode)
 	io.Copy(responseWriter, upstreamResponse.Body)
