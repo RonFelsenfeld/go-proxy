@@ -5,6 +5,7 @@ import (
 
 	"github.com/ronfelsenfeld/go-proxy/internal/config"
 	"github.com/ronfelsenfeld/go-proxy/internal/logger"
+	"github.com/ronfelsenfeld/go-proxy/internal/utils"
 )
 
 func Router(configuration *config.Config) http.Handler {
@@ -15,7 +16,7 @@ func Router(configuration *config.Config) http.Handler {
 	requestRouter.HandleFunc("/proxy", func(responseWriter http.ResponseWriter, request *http.Request) {
 		logger.Info.Println("🔍 Request received:", request.Method, request.URL.Path)
 		
-		if getIsPostRequest(request) || getIsPutRequest(request) {
+		if utils.GetIsPostRequest(request) || utils.GetIsPutRequest(request) {
 			proxyHandler(responseWriter, request, configuration)
 		} else {
 			logger.Error.Println("⛔️ Method not allowed:", request.Method, request.URL.Path)

@@ -1,13 +1,13 @@
 package server
 
 import (
-	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
 
 	"github.com/ronfelsenfeld/go-proxy/internal/config"
 	"github.com/ronfelsenfeld/go-proxy/internal/logger"
+	"github.com/ronfelsenfeld/go-proxy/internal/utils"
 )
 
 func pingHandler(responseWriter http.ResponseWriter, request *http.Request) {
@@ -19,50 +19,32 @@ func pingHandler(responseWriter http.ResponseWriter, request *http.Request) {
 }
 
 func proxyHandler(responseWriter http.ResponseWriter, request *http.Request, configuration *config.Config) {
-	var requestBody map[string]interface{}
-
-	if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
-		errorMessage := "Invalid request body"
-		logger.Error.Printf("❌ %s", errorMessage)
-		http.Error(responseWriter, errorMessage, http.StatusBadRequest)
+	requestBody, err := utils.DecodeJSONBody(request)
+	if err != nil {
+		logger.Error.Printf("❌ %s", err.Error())
+		http.Error(responseWriter, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	requestBody[configuration.InjectKey] = configuration.InjectValue
 	logger.Info.Printf("🔨 Modified request body: %+v", requestBody)
 
-	modifiedBody, err := json.Marshal(requestBody)
+	modifiedBody, err := utils.EncodeJSONBody(requestBody)
 	if err != nil {
-		errorMessage := "Failed to encode request body"
-		logger.Error.Printf("❌ %s", errorMessage)
-		http.Error(responseWriter, errorMessage, http.StatusInternalServerError)
+		logger.Error.Printf("❌ %s", err.Error())
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	upstreamRequest, err := http.NewRequest(request.Method, configuration.UpstreamURL, bytes.NewBuffer(modifiedBody))
+	upstreamResponse, err := utils.ForwardRequest(request, modifiedBody, configuration)
 	if err != nil {
-		errorMessage := "Failed to build upstream request"
-		logger.Error.Printf("❌ %s", errorMessage)
-		http.Error(responseWriter, errorMessage, http.StatusInternalServerError)
-		return
-	}
-
-	upstreamRequest.Header = request.Header.Clone()
-
-	upstreamResponse, err := http.DefaultClient.Do(upstreamRequest)
-	if err != nil {
-		errorMessage := "Failed to contact upstream"
-		logger.Error.Printf("❌ %s", errorMessage)
-		http.Error(responseWriter, errorMessage, http.StatusInternalServerError)
+		logger.Error.Printf("❌ %s", err.Error())
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer upstreamResponse.Body.Close()
 
-	for headerKey, headerValues := range upstreamResponse.Header {
-		for _, headerValue := range headerValues {
-			responseWriter.Header().Add(headerKey, headerValue)
-		}
-	}
+	utils.CopyHeaders(upstreamResponse.Header, responseWriter)
 
 	responseWriter.WriteHeader(upstreamResponse.StatusCode)
 	io.Copy(responseWriter, upstreamResponse.Body)
