@@ -1,4 +1,4 @@
-package server
+package proxy
 
 import (
 	"encoding/json"
@@ -9,8 +9,6 @@ import (
 	"github.com/ronfelsenfeld/go-proxy/internal/logger"
 	apiUtils "github.com/ronfelsenfeld/go-proxy/internal/utils/apiutils"
 )
-
-
 
 func pingHandler(responseWriter http.ResponseWriter, request *http.Request) {
 	response := map[string]string{"message": "pong"}

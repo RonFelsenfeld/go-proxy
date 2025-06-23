@@ -5,7 +5,7 @@ import (
 
 	"github.com/ronfelsenfeld/go-proxy/internal/config"
 	"github.com/ronfelsenfeld/go-proxy/internal/logger"
-	"github.com/ronfelsenfeld/go-proxy/internal/server"
+	"github.com/ronfelsenfeld/go-proxy/internal/proxy"
 )
 
 
@@ -18,7 +18,7 @@ func main() {
 	address := ":" + configuration.Port
 	logger.Info.Println("🔒 Starting HTTPS server on port", configuration.Port)
 
-	err = http.ListenAndServeTLS(address, configuration.CertPath, configuration.KeyPath, server.Router(configuration))
+	err = http.ListenAndServeTLS(address, configuration.CertPath, configuration.KeyPath, proxy.Router(configuration))
 	if err != nil {
 		logger.Error.Fatalf("❌ Failed to start server: %v", err)
 	}
