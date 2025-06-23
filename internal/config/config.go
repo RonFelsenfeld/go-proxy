@@ -22,12 +22,12 @@ func Load() (*Config, error) {
 	}
 
 	configuration := &Config{
-		Port: 					getEnv("GATEWAY_PORT", "443"),
-		CertPath: 			getEnv("GATEWAY_CERT_PATH", "certs/cert.pem"),
-		KeyPath: 				getEnv("GATEWAY_KEY_PATH", "certs/key.pem"),
-		UpstreamURL: 		getEnv("UPSTREAM_URL", "http://localhost:8081"),
-		InjectKey: 			getEnv("INJECT_KEY", "injected_key"),
-		InjectValue: 		getEnv("INJECT_VALUE", "injected_value"),
+		Port: 					getEnvVar("GATEWAY_PORT", "443"),
+		CertPath: 			getEnvVar("GATEWAY_CERT_PATH", "certs/cert.pem"),
+		KeyPath: 				getEnvVar("GATEWAY_KEY_PATH", "certs/key.pem"),
+		UpstreamURL: 		getEnvVar("UPSTREAM_URL", "http://localhost:8081"),
+		InjectKey: 			getEnvVar("INJECT_KEY", "injected_key"),
+		InjectValue: 		getEnvVar("INJECT_VALUE", "injected_value"),
 	}
 
 	if err := validateConfiguration(configuration); err != nil {
@@ -37,7 +37,7 @@ func Load() (*Config, error) {
 	return configuration, nil
 }
 
-func getEnv(key, defaultValue string) string {
+func getEnvVar(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
 	}
