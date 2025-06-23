@@ -8,18 +8,18 @@ import (
 	"github.com/ronfelsenfeld/go-proxy/internal/proxy"
 )
 
-
 func main() {
 	configuration, err := config.Load()
 	if err != nil {
 		logger.Error.Fatalf("❌ Failed to load configuration: %v", err)
 	}
 
-	address := ":" + configuration.Port
-	logger.Info.Println("🔒 Starting HTTPS server on port", configuration.Port)
+	address := ":" + configuration.ProxyPort
 
-	err = http.ListenAndServeTLS(address, configuration.CertPath, configuration.KeyPath, proxy.Router(configuration))
+	logger.Info.Printf("🚀 Proxy server listening on https://localhost:%s/proxy", configuration.ProxyPort)
+	err = http.ListenAndServeTLS(address, configuration.TLSCertPath, configuration.TLSKeyPath, proxy.Router(configuration))
+
 	if err != nil {
-		logger.Error.Fatalf("❌ Failed to start server: %v", err)
+		logger.Error.Fatalf("❌ Failed to start proxy server: %v", err)
 	}
 }

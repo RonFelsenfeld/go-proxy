@@ -9,11 +9,11 @@ import (
 )
 
 func Router(configuration *config.Config) http.Handler {
-	requestRouter := http.NewServeMux()
+	proxyRouter := http.NewServeMux()
 
-	requestRouter.HandleFunc("/ping", pingHandler)
+	proxyRouter.HandleFunc("/ping", pingHandler)
 
-	requestRouter.HandleFunc("/proxy", func(responseWriter http.ResponseWriter, request *http.Request) {
+	proxyRouter.HandleFunc("/proxy", func(responseWriter http.ResponseWriter, request *http.Request) {
 		logger.Info.Println("🔍 Request received:", request.Method, request.URL.Path)
 
 	
@@ -25,5 +25,5 @@ func Router(configuration *config.Config) http.Handler {
 		}
 	})
 
-	return requestRouter
+	return proxyRouter
 }
