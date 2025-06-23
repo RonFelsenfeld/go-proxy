@@ -1,10 +1,10 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/ronfelsenfeld/go-proxy/internal/logger"
 )
 
 type Config struct {
@@ -18,7 +18,7 @@ type Config struct {
 
 func Load() (*Config, error) {
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  No .env file found. Falling back to system env vars.")
+		logger.Warn.Println("⚠️  No .env file found. Falling back to system env vars.")
 	}
 
 	configuration := &Config{

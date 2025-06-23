@@ -1,9 +1,8 @@
 package main
 
 import (
-	"log"
-
 	"github.com/ronfelsenfeld/go-proxy/internal/config"
+	"github.com/ronfelsenfeld/go-proxy/internal/logger"
 )
 
 
@@ -11,8 +10,8 @@ func main() {
 	configuration, err := config.Load()
 
 	if err != nil {
-		log.Fatalf("❌ Failed to load configuration: %v", err)
+		logger.Error.Fatalf("❌ Failed to load configuration: %v", err)
 	}
 
-	log.Printf("✅ Loaded config: %+v\n", configuration)
+	logger.Info.Printf("✅ Loaded configuration: %+v\n", configuration)
 }
