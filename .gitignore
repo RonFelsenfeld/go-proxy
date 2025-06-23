@@ -1,0 +1,22 @@
+# Build artifacts
+*.exe
+*.out
+*.test
+
+# Go work & vendor directories
+vendor/
+bin/
+build/
+
+# IDE/editor configs
+.vscode/
+.idea/
+.DS_Store
+.cursor/
+
+# TLS certificates & secrets
+certs/
+*.pem
+
+# Logs
+*.log
