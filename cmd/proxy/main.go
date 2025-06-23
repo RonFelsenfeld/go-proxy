@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"github.com/ronfelsenfeld/go-proxy/internal/config"
+	"github.com/ronfelsenfeld/go-proxy/internal/logger"
+)
+
 
 func main() {
-	fmt.Println("Hello, World!")
+	configuration, err := config.Load()
+
+	if err != nil {
+		logger.Error.Fatalf("❌ Failed to load configuration: %v", err)
+	}
+
+	logger.Info.Printf("✅ Loaded configuration: %+v\n", configuration)
 }

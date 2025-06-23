@@ -20,3 +20,6 @@ certs/
 
 # Logs
 *.log
+
+# Environment variables
+.env
