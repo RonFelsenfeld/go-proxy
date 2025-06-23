@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/ronfelsenfeld/go-proxy/internal/config"
+	"github.com/ronfelsenfeld/go-proxy/internal/logger"
 )
 
 func GetIsPostRequest(request *http.Request) bool {
@@ -17,7 +18,7 @@ func GetIsPutRequest(request *http.Request) bool {
 	return request.Method == http.MethodPut
 }
 
-func DecodeJSONBody(request *http.Request) (map[string]any, error) {
+func DecodeRequestBody(request *http.Request) (map[string]any, error) {
 	var decodedBody map[string]any
 
 	if err := json.NewDecoder(request.Body).Decode(&decodedBody); err != nil {
@@ -27,7 +28,7 @@ func DecodeJSONBody(request *http.Request) (map[string]any, error) {
 	return decodedBody, nil
 }
 
-func EncodeJSONBody(body map[string]any) ([]byte, error) {
+func EncodeRequestBody(body map[string]any) ([]byte, error) {
 	encodedBody, err := json.Marshal(body)
 
 	if err != nil {
@@ -58,3 +59,10 @@ func ForwardRequest(originalRequest *http.Request, requestBody []byte, configura
 	return upstreamResponse, nil
 }
 
+func PrintRequestHeaders(request *http.Request) {
+	for name, values := range request.Header {
+			for _, value := range values {
+				logger.Info.Printf("🔹 Header: %s = %s", name, value)
+			}
+	}
+}

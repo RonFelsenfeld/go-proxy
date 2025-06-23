@@ -19,7 +19,7 @@ func pingHandler(responseWriter http.ResponseWriter, request *http.Request) {
 }
 
 func proxyHandler(responseWriter http.ResponseWriter, request *http.Request, configuration *config.Config) {
-	requestBody, err := apiUtils.DecodeJSONBody(request)
+	requestBody, err := apiUtils.DecodeRequestBody(request)
 	if err != nil {
 		logger.Error.Printf("❌ %s", err.Error())
 		http.Error(responseWriter, err.Error(), http.StatusBadRequest)
@@ -29,7 +29,7 @@ func proxyHandler(responseWriter http.ResponseWriter, request *http.Request, con
 	requestBody[configuration.InjectKey] = configuration.InjectValue
 	logger.Info.Printf("🔨 Modified request body: %+v", requestBody)
 
-	modifiedBody, err := apiUtils.EncodeJSONBody(requestBody)
+	modifiedBody, err := apiUtils.EncodeRequestBody(requestBody)
 	if err != nil {
 		logger.Error.Printf("❌ %s", err.Error())
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
