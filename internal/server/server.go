@@ -1,18 +1,27 @@
 package server
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/ronfelsenfeld/go-proxy/internal/config"
+	"github.com/ronfelsenfeld/go-proxy/internal/logger"
 )
 
-func Router() http.Handler {
-	mux := http.NewServeMux()
+func Router(configuration *config.Config) http.Handler {
+	requestRouter := http.NewServeMux()
 
-	mux.HandleFunc("/ping", func(responseWriter http.ResponseWriter, request *http.Request) {
-		response := map[string]string{"message": "pong"}
-		responseWriter.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(responseWriter).Encode(response)
+	requestRouter.HandleFunc("/ping", pingHandler)
+
+	requestRouter.HandleFunc("/proxy", func(responseWriter http.ResponseWriter, request *http.Request) {
+		logger.Info.Println("🔍 Request received:", request.Method, request.URL.Path)
+		
+		if getIsPostRequest(request) || getIsPutRequest(request) {
+			proxyHandler(responseWriter, request, configuration)
+		} else {
+			logger.Error.Println("⛔️ Method not allowed:", request.Method, request.URL.Path)
+			http.Error(responseWriter, "Method not allowed", http.StatusMethodNotAllowed)
+		}
 	})
 
-	return mux
+	return requestRouter
 }

@@ -18,7 +18,7 @@ func main() {
 	address := ":" + configuration.Port
 	logger.Info.Println("🔒 Starting HTTPS server on port", configuration.Port)
 
-	err = http.ListenAndServeTLS(address, configuration.CertPath, configuration.KeyPath, server.Router())
+	err = http.ListenAndServeTLS(address, configuration.CertPath, configuration.KeyPath, server.Router(configuration))
 	if err != nil {
 		logger.Error.Fatalf("❌ Failed to start server: %v", err)
 	}
