@@ -8,10 +8,11 @@ import (
 )
 
 type Config struct {
-	Port string
-	CertPath string
-	KeyPath string
 	UpstreamURL string
+	UpstreamPort string
+	ProxyPort string
+	TLSCertPath string
+	TLSKeyPath string
 	InjectKey string
 	InjectValue string
 }
@@ -22,12 +23,13 @@ func Load() (*Config, error) {
 	}
 
 	configuration := &Config{
-		Port: 					getEnv("GATEWAY_PORT", "443"),
-		CertPath: 			getEnv("GATEWAY_CERT_PATH", "certs/cert.pem"),
-		KeyPath: 				getEnv("GATEWAY_KEY_PATH", "certs/key.pem"),
-		UpstreamURL: 		getEnv("UPSTREAM_URL", "http://localhost:8081"),
-		InjectKey: 			getEnv("INJECT_KEY", "injected_key"),
-		InjectValue: 		getEnv("INJECT_VALUE", "injected_value"),
+		UpstreamURL: 					getEnvVar("UPSTREAM_URL", "http://localhost:8081"),
+		UpstreamPort: 				getEnvVar("UPSTREAM_PORT", "8081"),
+		ProxyPort: 						getEnvVar("PROXY_PORT", "443"),
+		TLSCertPath: 					getEnvVar("TLS_CERT_PATH", "certs/cert.pem"),
+		TLSKeyPath: 					getEnvVar("TLS_KEY_PATH", "certs/key.pem"),
+		InjectKey: 						getEnvVar("INJECT_KEY", "injected_key"),
+		InjectValue: 					getEnvVar("INJECT_VALUE", "injected_value"),
 	}
 
 	if err := validateConfiguration(configuration); err != nil {
@@ -37,7 +39,7 @@ func Load() (*Config, error) {
 	return configuration, nil
 }
 
-func getEnv(key, defaultValue string) string {
+func getEnvVar(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
 	}

@@ -12,11 +12,11 @@ func validateConfiguration(configuration *Config) error {
 		return errors.New("UPSTREAM_URL is required")
 	}
 
-	if err := getIsFileExists(configuration.CertPath); err != nil {
+	if err := getIsFileExists(configuration.TLSCertPath); err != nil {
 		return fmt.Errorf("invalid TLS_CERT_PATH: %w", err)
 	}
 
-	if err := getIsFileExists(configuration.KeyPath); err != nil {
+	if err := getIsFileExists(configuration.TLSKeyPath); err != nil {
 		return fmt.Errorf("invalid TLS_KEY_PATH: %w", err)
 	}
 
