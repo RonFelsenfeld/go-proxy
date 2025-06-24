@@ -1,4 +1,7 @@
-.PHONY: run-proxy-server run-upstream-server run-all-servers
+.PHONY: install-dependencies run-proxy-server run-upstream-server run-all-servers
+
+install-dependencies:
+	go mod tidy
 
 run-proxy-server:
 	go run cmd/proxy/main.go
