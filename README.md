@@ -92,15 +92,15 @@ The proxy server requires TLS certificates to run on HTTPS. Self-signed certific
 
    ```bash
    # Test the upstream server directly
-   curl -X POST http://localhost:${UPSTREAM_PORT:-8081}/test \
+   curl -X POST http://localhost:<UPSTREAM_PORT>/test \
      -H "Content-Type: application/json" \
      -d '{"test": "data"}'
 
    # Test the proxy ping endpoint
-   curl -k https://localhost:${PROXY_PORT:-443}/ping
+   curl -k https://localhost:<PROXY_PORT>/ping
 
    # Test proxying a request - notice the difference in response
-   curl -k -X POST https://localhost:${PROXY_PORT:-443}/proxy \
+   curl -k -X POST https://localhost:<PROXY_PORT>/proxy \
      -H "Content-Type: application/json" \
      -d '{"test": "data"}'
    ```
@@ -108,7 +108,7 @@ The proxy server requires TLS certificates to run on HTTPS. Self-signed certific
    **Notes:**
 
    - The `-k` flag tells curl to skip SSL certificate verification, which is necessary when using self-signed certificates.
-   - Replace `${PROXY_PORT:-443}` and `${UPSTREAM_PORT:-8081}` with your actual ports if you've configured different ports in your environment variables. The `-443` and `-8081` parts represent the default ports.
+   - Replace `<UPSTREAM_PORT>` and `<PROXY_PORT>` with your actual ports. Default values are `8081` for upstream and `443` for proxy.
    - The difference between direct upstream access and proxied requests is that the proxy injects additional key-value pairs into the request body before forwarding it to the upstream server.
 
 ## Environment Variables
